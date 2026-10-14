@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KeyLogger Overlay</title>
+    <style>
+        /* Overlay style */
+        #overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: none;
+        }
+        #logger {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <!-- Overlay container -->
+    <div id="overlay">
+        <div id="logger">
+            <h2>KeyLogger Overlay</h2>
+            <p id="log"></p>
+        </div>
+    </div>
+
+    <!-- Script to handle keylogging -->
+    <script>
+        // Get the overlay and log elements
+        const overlay = document.getElementById('overlay');
+        const logElement = document.getElementById('log');
+
+        // Initialize the log data
+        let logData = [];
+        let currentDate = new Date().toISOString().split('T')[0];
+
+        // Function to record key presses
+        function recordKeyPress(event) {
+            const key = event.key;
+            const timestamp = new Date().toLocaleString();
+            logData.push({ key, timestamp });
+
+            // Update the log element
+            logElement.innerText += `${timestamp}: ${key}\n`;
+
+            // Store the data in local storage for up to 7 days
+            localStorage.setItem('keyLog', JSON.stringify(logData));
+        }
+
+        // Function to toggle the overlay
+        function toggleOverlay() {
+            overlay.style.display = overlay.style.display === 'block' ? 'none' : 'block';
+        }
+
+        // Add event listener for key presses
+        document.addEventListener('keydown', recordKeyPress);
+
+        // Add event listener for overlay toggle (e.g., button click)
+        document.addEventListener('click', toggleOverlay);
+
+        // Load existing log data from local storage if available
+        if (localStorage.getItem('keyLog')) {
+            logData = JSON.parse(localStorage.getItem('keyLog'));
+            logElement.innerText = logData.map(entry => `${entry.timestamp}: ${entry.key}`).join('\n');
+        }
+    </script>
+</body>
+</html>
